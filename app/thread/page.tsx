@@ -12,6 +12,7 @@ import { useSearchParams } from 'next/navigation';
 import { useGetMessages, useAddMessage } from '@/hooks/thread';
 import { useRunAgents } from '@/hooks/runtime';
 import { last } from 'lodash-es';
+import Link from 'next/link';
 
 const AGENTS: Record<string, Agent> = {
   yieldo: AGENT_YIELDO,
@@ -73,7 +74,9 @@ export default function Home() {
     <div className="flex size-full gap-4">
       {/* Agent Section */}
       <Card className="flex h-full w-[8.125rem] flex-col items-center justify-start gap-20 pt-10">
-        <Image priority alt="Logo" src="/logo.png" width={46} height={45} />
+        <Link href="/">
+          <Image priority alt="Logo" src="/logo.png" width={46} height={45} />
+        </Link>
         <div className="flex flex-col gap-4 overflow-x-auto">
           {Object.values(AGENTS).map((agent, i) => {
             return (
@@ -89,7 +92,7 @@ export default function Home() {
       </Card>
 
       {/* Chat Section */}
-      <Card className="flex max-w-[50rem] flex-1 flex-col gap-0 py-0">
+      <Card className="flex flex-1 flex-col gap-0 py-0">
         {/* Chat Header */}
         <div className="flex flex-col gap-4 border-b border-gray-200 px-8 py-5">
           <h1 className="text-center text-2xl font-semibold">Autofarmers</h1>
@@ -153,8 +156,10 @@ export default function Home() {
         </div>
       </Card>
 
-      {/* Mission Section */}
-      <Card className="flex flex-1 flex-col"></Card>
+      {/* History Board */}
+      <Card className="flex max-w-md flex-1 flex-col">
+        {/* <HistoryBoard messages={messages} /> */}
+      </Card>
     </div>
   );
 }
