@@ -12,6 +12,8 @@ import { useGetMessages, useAddMessage } from '@/hooks/thread';
 import Link from 'next/link';
 import { useGetAgentsInfo, useRunAgents } from '@/hooks/runtime';
 import HistoryBoard from '@/components/HistoryBoard';
+import QRCodeComponent from '@/components/QRComponent';
+import { CheckIcon, ClipboardCopyIcon } from 'lucide-react';
 
 export default function Home() {
   const searchParams = useSearchParams();
@@ -20,6 +22,16 @@ export default function Home() {
 
   const { data: agentsInfo } = useGetAgentsInfo();
   console.log('agentsInfo :::', agentsInfo);
+  const [copied, setCopied] = useState(false);
+
+  const handlePublicKeyCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(publicKey);
+      setCopied(true);
+    } catch (error) {
+      console.error('복사 실패:', error);
+    }
+  };
 
   const { data: messages } = useGetMessages({
     threadId,
@@ -54,6 +66,7 @@ export default function Home() {
     },
     [addMessage, input],
   );
+  const publicKey = 'Ac434D3Y61BMjNmWRLziQTWp8b4UFaaURqgQNgRXyo4m';
 
   return (
     <div className="flex size-full gap-4">
@@ -141,9 +154,41 @@ export default function Home() {
       </Card>
 
       {/* History Board */}
-      <Card className="flex max-w-md flex-1 flex-col">
-        <HistoryBoard messages={messages} />
-      </Card>
+      <div className="flex max-w-md flex-1 flex-col gap-2">
+        <Card className="flex flex-row">
+          {publicKey && (
+            <>
+              <div className="flex">
+                <QRCodeComponent value={publicKey} size={128} />
+              </div>
+              <div className="flex grow flex-row">
+                <div className="flex h-full flex-col justify-center">
+                  <div className="flex gap-1 truncate font-mono font-medium overflow-ellipsis italic">
+                    <span>
+                      {publicKey.slice(0, 6) + '...' + publicKey.slice(-6)}
+                    </span>
+                    <button
+                      onClick={() => handlePublicKeyCopy()}
+                      className="flex hover:cursor-pointer"
+                    >
+                      {!copied ? (
+                        <ClipboardCopyIcon className="my-auto flex h-4 w-4" />
+                      ) : (
+                        <CheckIcon className="text-success my-auto flex h-4 w-4" />
+                      )}
+                    </button>
+                  </div>
+                  <br />
+                  <div className="text-xl font-bold">Send Sol to Test!</div>
+                </div>
+              </div>
+            </>
+          )}
+        </Card>
+        <Card className="flex grow flex-col">
+          <HistoryBoard messages={messages} />
+        </Card>
+      </div>
     </div>
   );
 }
