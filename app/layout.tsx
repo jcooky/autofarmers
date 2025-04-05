@@ -20,7 +20,7 @@ const OG_IMAGE_URL = '/thumbnail.png';
 const OG_URL =
   process.env.NODE_ENV === 'development'
     ? 'http://localhost:3000'
-    : 'https://autofarmers.vercel.app';
+    : 'https://autofarmers.habili.ai';
 
 export const metadata: Metadata = {
   metadataBase: new URL(OG_URL),
