@@ -19,6 +19,7 @@ import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import { z } from 'zod';
 import { transactionSchema } from '@/data/sendai';
+import { useGetPoolName } from '@/hooks/pool_info';
 
 export default function TransactionResult({
   info,
@@ -27,6 +28,8 @@ export default function TransactionResult({
   info: z.infer<typeof transactionSchema>;
   onRetry?: () => void;
 }) {
+  const { data: pool } = useGetPoolName(info.whirlpoolAddress);
+
   const [copied, setCopied] = useState(false);
   const [retrying, setRetrying] = useState(false);
 
@@ -36,7 +39,9 @@ export default function TransactionResult({
   }, [info.status, retrying]);
 
   const handleCopyTxId = () => {
-    navigator.clipboard.writeText(info.transaction ?? '');
+    if (!info.signature?.transactionId) return;
+
+    navigator.clipboard.writeText(info.signature.transactionId);
     setCopied(true);
     toast.success('Transaction ID has been copied to your clipboard');
     setTimeout(() => setCopied(false), 2000);
@@ -69,7 +74,9 @@ export default function TransactionResult({
             size="sm"
             className="h-8 gap-1 text-xs"
             onClick={() =>
-              window.open(`https://explorer.solana.com/tx/${info.transaction}`)
+              window.open(
+                `https://explorer.solana.com/tx/${info.signature?.transactionId}`,
+              )
             }
           >
             View <ExternalLink className="h-3 w-3" />
@@ -77,7 +84,9 @@ export default function TransactionResult({
         </div>
         {status === 'success' && (
           <div className="text-muted-foreground flex items-center gap-2 pb-2 text-sm">
-            <span className="truncate">Tx: {info.transaction}</span>
+            <span className="truncate">
+              Tx: {info.signature?.transactionId}
+            </span>
             <Button
               variant="ghost"
               size="icon"
@@ -98,7 +107,7 @@ export default function TransactionResult({
           <div className="space-y-6">
             <div>
               <div className="mb-2">Pool</div>
-              <div className="text-2xl font-bold">{info.poolName}</div>
+              <div className="text-2xl font-bold">{pool?.poolName}</div>
             </div>
             <div>
               <p className="mb-2">Amount</p>

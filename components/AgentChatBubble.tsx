@@ -4,7 +4,6 @@ import MyTokenTable from './toolCards/MyTokenTable';
 import LiquidPoolTable from './toolCards/LiquidPoolTable';
 import TransactionResult from './toolCards/TransactionResult';
 import AgentProfile from './AgentProfile';
-import { Agent } from '@/data/agents';
 import { messageSchema } from '@/data/thread';
 import { z } from 'zod';
 import MarkdownRenderer from './MarkdownRenderer';
@@ -18,7 +17,11 @@ export default function AgentChatBubble({
   onRetry,
 }: {
   id: number;
-  agent: Agent;
+  agent: {
+    name: string;
+    role: string;
+    profileImage: string;
+  };
   text?: string;
   working?: boolean;
   metadata?: z.infer<typeof messageSchema.shape.metadata>;

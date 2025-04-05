@@ -60,7 +60,24 @@ export const transactionSchema = z.object({
   whirlpoolAddress: z.string(),
   status: z.string(),
   message: z.string().optional(),
-  transaction: z.string().optional(),
+  signature: z
+    .preprocess(
+      (arg) => {
+        if (typeof arg === 'string') {
+          try {
+            return JSON.parse(arg);
+          } catch (e) {
+            throw new Error(`Invalid signature JSON string ${e}`);
+          }
+        }
+        return arg;
+      },
+      z.object({
+        transactionId: z.string(),
+        positionMint: z.string(),
+      }),
+    )
+    .optional(),
 });
 
 export const liquidPoolPositionsSchema = z.object({

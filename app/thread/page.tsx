@@ -11,6 +11,7 @@ import { useSearchParams } from 'next/navigation';
 import { useGetMessages, useAddMessage } from '@/hooks/thread';
 import Link from 'next/link';
 import { useGetAgentsInfo, useRunAgents } from '@/hooks/runtime';
+import HistoryBoard from '@/components/HistoryBoard';
 
 export default function Home() {
   const searchParams = useSearchParams();
@@ -141,7 +142,7 @@ export default function Home() {
 
       {/* History Board */}
       <Card className="flex max-w-md flex-1 flex-col">
-        {/* <HistoryBoard messages={messages} /> */}
+        <HistoryBoard messages={messages} />
       </Card>
     </div>
   );
