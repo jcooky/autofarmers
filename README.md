@@ -1,5 +1,5 @@
 <p align="center">
-  <img alt="Brand image for thumbnail of Autofarmers" src="https://raw.githubusercontent.com/jcooky/autofarmers/refs/heads/main/public/thumbnail.png" width="50%" />
+  <img alt="Brand image for thumbnail of Autofarmers" src="https://u6mo491ntx4iwuoz.public.blob.vercel-storage.com/autofarmers/thumbnail-EiE2Vv5i2E5AYWjhYXRrJyGZmAeAor.png" width="50%" />
 </p>
 
 <h1 align="center">Autofarmers</h1>

@@ -16,7 +16,8 @@ const fontsMono = Noto_Sans_Mono({
 const TITLE = 'Autofarmers';
 const DESCRIPTION =
   'DeFi assistant platform with AI agents for cryptocurrency swaps, yield farming, and liquidity pool management through an interactive chat interface.';
-const OG_IMAGE_URL = '/thumbnail.png';
+const OG_IMAGE_URL =
+  'https://u6mo491ntx4iwuoz.public.blob.vercel-storage.com/autofarmers/thumbnail-EiE2Vv5i2E5AYWjhYXRrJyGZmAeAor.png';
 const OG_URL =
   process.env.NODE_ENV === 'development'
     ? 'http://localhost:3000'
