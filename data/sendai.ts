@@ -21,3 +21,54 @@ export const tradeSchema = z.object({
   transaction: z.string(),
   message: z.string(),
 });
+
+export const trendingPoolsSchema = z.array(
+  z.object({
+    id: z.string(),
+    attributes: z.object({
+      base_token_price_usd: z.string(),
+      base_token_price_native_currency: z.string(),
+      quote_token_price_usd: z.string(),
+      quote_token_price_native_currency: z.string(),
+      base_token_price_quote_token: z.string(),
+      quote_token_price_base_token: z.string(),
+      address: z.string(),
+      name: z.string(),
+      pool_created_at: z.string(),
+      fdv_usd: z.string(),
+      market_cap_usd: z.string().nullable(),
+      reserve_in_usd: z.string(),
+      volume_usd: z.object({
+        h1: z.string(),
+        h6: z.string(),
+        h24: z.string(),
+      }),
+      price_change_percentage: z.object({
+        h1: z.string(),
+        h6: z.string(),
+        h24: z.string(),
+      }),
+    }),
+  }),
+);
+
+export const transactionSchema = z.object({
+  poolName: z.string().optional(),
+  inputAmount: z.number(),
+  inputTokenMint: z.string(),
+  priceOffsetBps: z.number(),
+  whirlpoolAddress: z.string(),
+  status: z.string(),
+  message: z.string().optional(),
+  transaction: z.string().optional(),
+});
+
+export const liquidPoolPositionsSchema = z.object({
+  status: z.string(),
+  message: z.string().optional(),
+  positions: z.record(
+    z.object({
+      whirlpoolAddress: z.string(),
+    }),
+  ),
+});

@@ -11,7 +11,6 @@ import AgentProfile from '@/components/AgentProfile';
 import { useSearchParams } from 'next/navigation';
 import { useGetMessages, useAddMessage } from '@/hooks/thread';
 import { useRunAgents } from '@/hooks/runtime';
-import { last } from 'lodash-es';
 import Link from 'next/link';
 
 const AGENTS: Record<string, Agent> = {
@@ -56,19 +55,6 @@ export default function Home() {
     },
     [addMessage, input],
   );
-
-  const handleOnClickConfirm = useCallback(
-    (message?: string) => {
-      onSubmit(message);
-    },
-    [onSubmit],
-  );
-
-  const handleOnClickCancel = useCallback(() => {
-    if (!messages) return;
-
-    onSubmit(`@${last(messages)?.sender} cancel`);
-  }, [messages, onSubmit]);
 
   return (
     <div className="flex size-full gap-4">
@@ -115,8 +101,6 @@ export default function Home() {
         {messages && (
           <div className="flex grow flex-col gap-4 overflow-y-auto pr-10 pl-6">
             {messages.map((message, i) => {
-              const isLastMessage = i === messages.length - 1;
-
               if (message.sender !== 'USER') {
                 return (
                   <AgentChatBubble
@@ -124,10 +108,7 @@ export default function Home() {
                     id={message.id}
                     agent={AGENTS[message.sender.toLowerCase()]}
                     text={message.content}
-                    isLastMessage={isLastMessage}
                     metadata={message.metadata}
-                    onClickConfirm={handleOnClickConfirm}
-                    onClickCancel={handleOnClickCancel}
                     onRetry={() =>
                       addMessage(`@${message.sender} Again please.`)
                     }

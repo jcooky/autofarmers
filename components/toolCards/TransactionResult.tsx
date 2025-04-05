@@ -17,33 +17,26 @@ import {
 import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
 import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
+import { z } from 'zod';
+import { transactionSchema } from '@/data/sendai';
 
 export default function TransactionResult({
-  metadata,
+  info,
   onRetry: handleRetry,
 }: {
-  metadata:
-    | {
-        [key: string]: unknown;
-      }
-    | undefined;
-  onRetry: () => void;
+  info: z.infer<typeof transactionSchema>;
+  onRetry?: () => void;
 }) {
-  const txId = metadata?.tx as string;
-  const poolName = metadata?.poolName as string;
-  const amount = metadata?.amount as number;
-  const state = metadata?.status as string;
-
   const [copied, setCopied] = useState(false);
   const [retrying, setRetrying] = useState(false);
 
   const status = useMemo(() => {
-    if (!retrying) return state;
+    if (!retrying) return info.status;
     else return 'retrying';
-  }, [state, retrying]);
+  }, [info.status, retrying]);
 
   const handleCopyTxId = () => {
-    navigator.clipboard.writeText(txId);
+    navigator.clipboard.writeText(info.transaction ?? '');
     setCopied(true);
     toast.success('Transaction ID has been copied to your clipboard');
     setTimeout(() => setCopied(false), 2000);
@@ -76,39 +69,41 @@ export default function TransactionResult({
             size="sm"
             className="h-8 gap-1 text-xs"
             onClick={() =>
-              window.open(`https://explorer.solana.com/tx/${txId}`)
+              window.open(`https://explorer.solana.com/tx/${info.transaction}`)
             }
           >
             View <ExternalLink className="h-3 w-3" />
           </Button>
         </div>
-        <div className="text-muted-foreground flex items-center gap-2 pb-2 text-sm">
-          <span className="truncate">Tx: {txId}</span>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-6 w-6"
-            onClick={handleCopyTxId}
-          >
-            {copied ? (
-              <Check className="h-3 w-3" />
-            ) : (
-              <Copy className="h-3 w-3" />
-            )}
-          </Button>
-        </div>
+        {status === 'success' && (
+          <div className="text-muted-foreground flex items-center gap-2 pb-2 text-sm">
+            <span className="truncate">Tx: {info.transaction}</span>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-6 w-6"
+              onClick={handleCopyTxId}
+            >
+              {copied ? (
+                <Check className="h-3 w-3" />
+              ) : (
+                <Copy className="h-3 w-3" />
+              )}
+            </Button>
+          </div>
+        )}
       </CardHeader>
       {status === 'success' && (
         <div className="px-6 pb-6">
           <div className="space-y-6">
             <div>
               <div className="mb-2">Pool</div>
-              <div className="text-2xl font-bold">{poolName}</div>
+              <div className="text-2xl font-bold">{info.poolName}</div>
             </div>
             <div>
               <p className="mb-2">Amount</p>
               <p className="text-2xl font-bold">
-                {amount.toLocaleString('en-US', {
+                {info.inputAmount?.toLocaleString('en-US', {
                   maximumFractionDigits: 2,
                 })}
               </p>
@@ -123,7 +118,9 @@ export default function TransactionResult({
               <AlertCircle className="h-4 w-4" />
               <AlertTitle>Transaction Failed</AlertTitle>
               <AlertDescription>
-                The network is congested. Please try again.
+                The network is congested.
+                <br />
+                Please try again.
               </AlertDescription>
             </Alert>
           </CardContent>
@@ -132,7 +129,7 @@ export default function TransactionResult({
               <Button
                 onClick={() => {
                   setRetrying(true);
-                  handleRetry();
+                  handleRetry?.();
                 }}
                 className="flex-1"
               >

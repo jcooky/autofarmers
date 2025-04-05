@@ -8,7 +8,12 @@ import { ChannelCredentials } from '@grpc/grpc-js';
 import { NextRequest } from 'next/server';
 import { isArray, omit } from 'lodash-es';
 import { Message } from '@/data/thread';
-import { balanceSchema, tradeSchema } from '@/data/sendai';
+import {
+  balanceSchema,
+  tradeSchema,
+  trendingPoolsSchema,
+  transactionSchema,
+} from '@/data/sendai';
 
 export async function GET(
   _: NextRequest,
@@ -43,7 +48,16 @@ export async function GET(
       };
 
       for (const toolCall of toolCalls) {
-        if (['TRADE', 'TOKEN_BALANCE_ACTION'].includes(toolCall.name)) {
+        if (
+          [
+            'TRADE',
+            'TOKEN_BALANCE_ACTION',
+            'GET_COINGECKO_TRENDING_POOLS_ACTION',
+            'FETCH_TOP_LIST_LIQUIDITY_POOLS',
+            'OPEN_ORCA_POSITION_WITH_LIQUIDITY',
+            'FETCH_ORCA_POSITIONS_ACTION',
+          ].includes(toolCall.name)
+        ) {
           if (!toolCall.result || !toolCall.result.result) {
             continue;
           }
@@ -73,6 +87,25 @@ export async function GET(
             case 'TRADE':
               {
                 record.metadata['trade'] = tradeSchema.parse(data);
+              }
+              break;
+            case 'FETCH_TOP_LIST_LIQUIDITY_POOLS':
+              {
+                record.metadata['trendingPools'] =
+                  trendingPoolsSchema.parse(data);
+              }
+              break;
+            case 'OPEN_ORCA_POSITION_WITH_LIQUIDITY':
+              {
+                record.metadata['transactionResult'] = transactionSchema.parse({
+                  ...toolCall.arguments,
+                  ...data,
+                });
+              }
+              break;
+            case 'FETCH_ORCA_POSITIONS_ACTION':
+              {
+                // TODO: add liquidPoolPositionsSchema
               }
               break;
           }

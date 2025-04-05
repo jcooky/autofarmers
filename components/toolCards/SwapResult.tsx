@@ -98,7 +98,7 @@ export default function SwapResult({
   onRetry: handleRetry,
 }: {
   info: z.infer<typeof tradeSchema>;
-  onRetry: () => void;
+  onRetry?: () => void;
 }) {
   const [copied, setCopied] = useState(false);
   const { transaction: txId } = { ...info };
@@ -171,7 +171,9 @@ export default function SwapResult({
               <AlertCircle className="h-4 w-4" />
               <AlertTitle>Transaction Failed</AlertTitle>
               <AlertDescription>
-                The network is congested. Please try again.
+                The network is congested.
+                <br />
+                Please try again.
               </AlertDescription>
             </Alert>
           </CardContent>
@@ -180,7 +182,7 @@ export default function SwapResult({
               <Button
                 onClick={() => {
                   setRetrying(true);
-                  handleRetry();
+                  handleRetry?.();
                 }}
                 className="flex-1"
               >

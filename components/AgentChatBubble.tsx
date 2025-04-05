@@ -1,13 +1,10 @@
 import { ChevronRight } from 'lucide-react';
-import { Fragment, useMemo } from 'react';
+import { useMemo } from 'react';
 import MyTokenTable from './toolCards/MyTokenTable';
-import SwapForm from './toolCards/SwapForm';
 import LiquidPoolTable from './toolCards/LiquidPoolTable';
-import TransactionConfirm from './toolCards/TransactionConfirm';
 import TransactionResult from './toolCards/TransactionResult';
 import AgentProfile from './AgentProfile';
 import { Agent } from '@/data/agents';
-import MyPositionTable from './toolCards/MyPositionTable';
 import { messageSchema } from '@/data/thread';
 import { z } from 'zod';
 import MarkdownRenderer from './MarkdownRenderer';
@@ -17,20 +14,14 @@ export default function AgentChatBubble({
   agent,
   text = '',
   working = false,
-  isLastMessage = false,
   metadata,
-  onClickConfirm,
-  onClickCancel,
   onRetry,
 }: {
   id: number;
   agent: Agent;
   text?: string;
-  isLastMessage?: boolean;
   working?: boolean;
   metadata?: z.infer<typeof messageSchema.shape.metadata>;
-  onClickConfirm: (message?: string) => void;
-  onClickCancel: () => void;
   onRetry: () => void;
 }) {
   const title = useMemo(() => {
@@ -78,32 +69,24 @@ export default function AgentChatBubble({
         {metadata && (
           <>
             {metadata['balance'] && <MyTokenTable balance={metadata.balance} />}
-            {metadata['SwapForm'] && (
-              <SwapForm
-                isLastMessage={isLastMessage}
-                metadata={metadata}
-                onClickConfirm={onClickConfirm}
-                onClickCancel={onClickCancel}
-              />
-            )}
             {metadata['trade'] && (
               <SwapResult info={metadata['trade']} onRetry={onRetry} />
             )}
-            {metadata['LiquidPools'] && <LiquidPoolTable metadata={metadata} />}
-            {metadata['TransactionConfirm'] && (
-              <TransactionConfirm
-                isLastMessage={isLastMessage}
-                metadata={metadata}
-                onClickConfirm={onClickConfirm}
-                onClickCancel={onClickCancel}
+            {metadata['trendingPools'] && (
+              <LiquidPoolTable trendingPools={metadata.trendingPools} />
+            )}
+            {metadata['transactionResult'] && (
+              <TransactionResult
+                info={metadata.transactionResult}
+                onRetry={onRetry}
               />
             )}
-            {metadata['TransactionResult'] && (
-              <TransactionResult metadata={metadata} onRetry={onRetry} />
-            )}
-            {metadata['LiquidPoolPositions'] && (
-              <MyPositionTable metadata={metadata} />
-            )}
+
+            {/*
+              {metadata['LiquidPoolPositions'] && (
+                <MyPositionTable metadata={metadata} />
+              )}
+            */}
           </>
         )}
       </div>

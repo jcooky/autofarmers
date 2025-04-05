@@ -1,5 +1,11 @@
 import { z } from 'zod';
-import { balanceSchema, tradeSchema } from './sendai';
+import {
+  balanceSchema,
+  liquidPoolPositionsSchema,
+  tradeSchema,
+  transactionSchema,
+  trendingPoolsSchema,
+} from './sendai';
 
 export const threadSchema = z.object({
   id: z.number(),
@@ -19,11 +25,9 @@ export const messageSchema = z.object({
   metadata: z.object({
     balance: balanceSchema.optional(),
     trade: tradeSchema.optional(),
-    SwapForm: z.any().optional(),
-    LiquidPools: z.any().optional(),
-    TransactionConfirm: z.any().optional(),
-    TransactionResult: z.any().optional(),
-    LiquidPoolPositions: z.any().optional(),
+    trendingPools: trendingPoolsSchema.optional(),
+    transactionResult: transactionSchema.optional(),
+    liquidPoolPositions: liquidPoolPositionsSchema.optional(),
   }),
 });
 
