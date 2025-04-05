@@ -55,10 +55,10 @@ export class RegisterAgentRequest extends jspb.Message {
   getSecure(): boolean;
   setSecure(value: boolean): void;
 
-  clearNamesList(): void;
-  getNamesList(): Array<string>;
-  setNamesList(value: Array<string>): void;
-  addNames(value: string, index?: number): string;
+  clearInfoList(): void;
+  getInfoList(): Array<AgentInfo>;
+  setInfoList(value: Array<AgentInfo>): void;
+  addInfo(value?: AgentInfo, index?: number): AgentInfo;
 
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): RegisterAgentRequest.AsObject;
@@ -74,7 +74,7 @@ export namespace RegisterAgentRequest {
   export type AsObject = {
     addr: string,
     secure: boolean,
-    namesList: Array<string>,
+    infoList: Array<AgentInfo.AsObject>,
   }
 }
 
@@ -128,17 +128,44 @@ export namespace GetAgentRuntimeInfoResponse {
   }
 }
 
+export class AgentInfo extends jspb.Message {
+  getName(): string;
+  setName(value: string): void;
+
+  getRole(): string;
+  setRole(value: string): void;
+
+  getMetadataMap(): jspb.Map<string, string>;
+  clearMetadataMap(): void;
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): AgentInfo.AsObject;
+  static toObject(includeInstance: boolean, msg: AgentInfo): AgentInfo.AsObject;
+  static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+  static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+  static serializeBinaryToWriter(message: AgentInfo, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): AgentInfo;
+  static deserializeBinaryFromReader(message: AgentInfo, reader: jspb.BinaryReader): AgentInfo;
+}
+
+export namespace AgentInfo {
+  export type AsObject = {
+    name: string,
+    role: string,
+    metadataMap: Array<[string, string]>,
+  }
+}
+
 export class AgentRuntimeInfo extends jspb.Message {
+  hasInfo(): boolean;
+  clearInfo(): void;
+  getInfo(): AgentInfo | undefined;
+  setInfo(value?: AgentInfo): void;
+
   getAddr(): string;
   setAddr(value: string): void;
 
   getSecure(): boolean;
   setSecure(value: boolean): void;
-
-  clearAgentNamesList(): void;
-  getAgentNamesList(): Array<string>;
-  setAgentNamesList(value: Array<string>): void;
-  addAgentNames(value: string, index?: number): string;
 
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): AgentRuntimeInfo.AsObject;
@@ -152,9 +179,9 @@ export class AgentRuntimeInfo extends jspb.Message {
 
 export namespace AgentRuntimeInfo {
   export type AsObject = {
+    info?: AgentInfo.AsObject,
     addr: string,
     secure: boolean,
-    agentNamesList: Array<string>,
   }
 }
 

@@ -9,7 +9,7 @@ export default function AgentProfile({
   name,
 }: {
   profileImage: string;
-  state?: 'idle' | 'working' | 'waiting';
+  state?: string; // 'idle' | 'working' | 'waiting';
   size?: 'md' | 'lg';
   name?: string;
 }) {

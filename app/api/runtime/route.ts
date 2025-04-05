@@ -4,11 +4,54 @@ import {
   GetAgentRuntimeInfoRequest,
   GetAgentRuntimeInfoResponse,
 } from '@/proto/network';
-import { AgentRuntimeClient } from '@/proto/runtime';
-import { RunRequest } from '@/proto/runtime_pb';
+import { RunRequest, AgentRuntimeClient } from '@/proto/runtime';
 import { ChannelCredentials } from '@grpc/grpc-js';
-import { NextRequest } from 'next/server';
-import { intersectIgnoreCase } from '@/utils/intersect';
+import { NextRequest, NextResponse } from 'next/server';
+import { agentSchema } from '@/data/agents';
+import { z } from 'zod';
+
+export async function GET(): Promise<NextResponse> {
+  const networkClient = new AgentNetworkClient(
+    process.env.NETWORK_GRPC_ADDR!,
+    ChannelCredentials.createInsecure(),
+  );
+
+  const { agentRuntimeInfoList: runtimeInfoList } =
+    await new Promise<GetAgentRuntimeInfoResponse.AsObject>(
+      (resolve, reject) => {
+        const r = new GetAgentRuntimeInfoRequest();
+        r.setAll(true);
+        networkClient.getAgentRuntimeInfo(r, (err, value) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(value!.toObject());
+          }
+        });
+      },
+    );
+
+  return NextResponse.json<Record<string, z.infer<typeof agentSchema>>>(
+    Object.fromEntries(
+      runtimeInfoList.map((t) => {
+        if (!t.info) {
+          throw new Error(`Invalid agents runtime info`);
+        }
+
+        const metadata = Object.fromEntries(t.info.metadataMap);
+        return [
+          t.info.name.toLowerCase(),
+          {
+            name: t.info.name,
+            role: t.info.role,
+            state: 'idle',
+            profileImage: metadata['profileImage'],
+          },
+        ];
+      }),
+    ),
+  );
+}
 
 export async function POST(request: NextRequest) {
   const { threadId, agentNames } = runRequestSchema.parse(await request.json());
@@ -40,20 +83,20 @@ export async function POST(request: NextRequest) {
 
   try {
     await Promise.all(
-      runtimeInfo.map(async ({ addr, agentNamesList: names }) => {
+      runtimeInfo.map(async ({ addr, info }) => {
+        if (!info) {
+          console.error(`Agent not found`);
+          return;
+        }
         const agentRuntimeClient = new AgentRuntimeClient(
           addr,
           ChannelCredentials.createInsecure(),
         );
-        const targets = intersectIgnoreCase(agentNames, names);
-        if (targets.length == 0) {
-          return;
-        }
 
         await new Promise<void>((resolve, reject) => {
           const r = new RunRequest();
           r.setThreadId(threadId);
-          r.setAgentNamesList(targets);
+          r.setAgentNamesList([info.name]);
 
           console.log('run request:', r.toObject());
           agentRuntimeClient.run(r, (err) => {

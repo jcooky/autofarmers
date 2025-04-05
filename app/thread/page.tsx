@@ -6,21 +6,19 @@ import Image from 'next/image';
 import { useCallback, useState } from 'react';
 import UserMessageInput from '@/components/UserMessageInput';
 import AgentChatBubble from '@/components/AgentChatBubble';
-import { Agent, AGENT_SWAVV, AGENT_YIELDO } from '@/data/agents';
 import AgentProfile from '@/components/AgentProfile';
 import { useSearchParams } from 'next/navigation';
 import { useGetMessages, useAddMessage } from '@/hooks/thread';
-import { useRunAgents } from '@/hooks/runtime';
 import Link from 'next/link';
+import { useGetAgentsInfo, useRunAgents } from '@/hooks/runtime';
 
-const AGENTS: Record<string, Agent> = {
-  yieldo: AGENT_YIELDO,
-  swavv: AGENT_SWAVV,
-};
 export default function Home() {
   const searchParams = useSearchParams();
   const threadId = parseInt(searchParams.get('id') ?? '0');
   const [input, setInput] = useState('');
+
+  const { data: agentsInfo } = useGetAgentsInfo();
+  console.log('agentsInfo :::', agentsInfo);
 
   const { data: messages } = useGetMessages({
     threadId,
@@ -64,7 +62,7 @@ export default function Home() {
           <Image priority alt="Logo" src="/logo.png" width={46} height={45} />
         </Link>
         <div className="flex flex-col gap-4 overflow-x-auto">
-          {Object.values(AGENTS).map((agent, i) => {
+          {Object.values(agentsInfo).map((agent, i) => {
             return (
               <AgentProfile
                 key={`agent-side-${i}`}
@@ -83,7 +81,7 @@ export default function Home() {
         <div className="flex flex-col gap-4 border-b border-gray-200 px-8 py-5">
           <h1 className="text-center text-2xl font-semibold">Autofarmers</h1>
           <div className="flex min-h-20 w-full items-center gap-10 overflow-x-auto">
-            {Object.values(AGENTS).map((agent, i) => {
+            {Object.values(agentsInfo).map((agent, i) => {
               return (
                 <AgentProfile
                   key={`agent-header-${i}`}
@@ -101,12 +99,16 @@ export default function Home() {
         {messages && (
           <div className="flex grow flex-col gap-4 overflow-y-auto pr-10 pl-6">
             {messages.map((message, i) => {
+              const agentInfo = agentsInfo[message.sender.toLowerCase()];
+              if (!agentInfo) {
+                return null;
+              }
               if (message.sender !== 'USER') {
                 return (
                   <AgentChatBubble
                     key={`chat-agent-message-${i}`}
                     id={message.id}
-                    agent={AGENTS[message.sender.toLowerCase()]}
+                    agent={agentInfo}
                     text={message.content}
                     metadata={message.metadata}
                     onRetry={() =>
