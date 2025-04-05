@@ -31,8 +31,8 @@ function SwapResultContent({ info }: { info: z.infer<typeof tradeSchema> }) {
   const { data: tokenPrices } = useGetTokenPrice(
     tokens.map((t) => {
       return {
-        id: t.name,
-        address: t.address,
+        id: t?.name ?? '',
+        address: t?.address ?? '',
       };
     }),
   );

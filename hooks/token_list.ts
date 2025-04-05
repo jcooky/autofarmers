@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { TokenInfo, TokenListProvider } from '@solana/spl-token-registry';
+import { TokenListProvider } from '@solana/spl-token-registry';
 
 export function useGetTokenList(addresses: string[]) {
   return useQuery({
@@ -11,7 +11,7 @@ export function useGetTokenList(addresses: string[]) {
         .then((t) => t.getList());
 
       return addresses.map((addr) => {
-        return tokens.find((t) => t.address === addr)!;
+        return tokens.find((t) => t.address === addr);
       });
     },
   });
